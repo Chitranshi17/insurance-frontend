@@ -82,3 +82,11 @@ export const fulfilledPolicies = async () => {
   const response = await axiosInstance.get("/customers/notifications");
   return response.data;
 };
+
+export const getClaimImages = async (policyId) => {
+  const response = await axiosInstance.get(
+    `/surveyors/claims/${policyId}/images`
+  );
+  console.log(response, "response");
+  return response.data;
+};

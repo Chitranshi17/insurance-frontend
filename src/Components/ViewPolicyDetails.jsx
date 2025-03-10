@@ -8,25 +8,23 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { Close, CloudUpload } from "@mui/icons-material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
+  getSurveyorClaimImage,
   getSurveyorPolicyList,
   objectDamageData,
 } from "../Redux/Slice/dataSlice";
 import toast from "react-hot-toast";
 
-const BASE_URL = "http://localhost:12000/";
-
 const ViewPolicyDetails = ({ open, handleClose, viewPolicy }) => {
-  const { damageDataInfoCollect } = useSelector((state) => state.data);
+  const { claimImageData } = useSelector((state) => state.data);
   const [assessment, setAssessment] = useState("");
   const [surveyorComments, setSurveyorComments] = useState("");
   const [damagePercentage, setDamagePercentage] = useState(null);
   const [imageName, setImageName] = useState("Upload Damage Image*");
   const isMobile = useMediaQuery("(max-width:600px)");
   const [damageImage, setDamageImage] = useState(null);
-  console.log(damageDataInfoCollect, "damageDataInfoCollect");
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -69,6 +67,11 @@ const ViewPolicyDetails = ({ open, handleClose, viewPolicy }) => {
       }
     });
   };
+
+  const policyIdSave = viewPolicy?.policyId;
+  useEffect(() => {
+    dispatch(getSurveyorClaimImage(policyIdSave));
+  }, [policyIdSave, damagePercentage]);
 
   const handleCloseModal = () => {
     handleClose();
@@ -201,6 +204,7 @@ const ViewPolicyDetails = ({ open, handleClose, viewPolicy }) => {
                   height: "5.4vh",
                   "&:hover": { backgroundColor: "#4500b5" },
                 }}
+                disabled={viewPolicy?.policyStatus != "under review"}
               >
                 {imageName.length > 20
                   ? `${imageName.substring(0, 17)}...`
@@ -229,45 +233,34 @@ const ViewPolicyDetails = ({ open, handleClose, viewPolicy }) => {
           </Typography>
         </Box>
 
-        {/* Image Code */}
-        {!viewPolicy?.surveyorReport?.damagePercentage ? (
-          <></>
-        ) : (
-          <>
-            <Box
-              sx={{
-                width: "100%",
-                height: "auto",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginTop: "1vh",
-                flexDirection: { xs: "column", sm: "row" },
-              }}
-            >
-              <img
-                style={{
-                  width: "48%",
-                  height: "auto",
-                  border: "1px solid black",
-                }}
-                src={`${BASE_URL}${viewPolicy?.beforeDamageImage}`}
-                // src={`${BASE_URL}${policy?.beforeDamageImage}`}
-                // src={damageDataInfoCollect?.policy?.beforeDamageImage}
-              />
-              <img
-                style={{
-                  width: "48%",
-                  height: "auto",
-                  border: "1px solid black",
-                }}
-                // src={damageDataInfoCollect?.surveyorReport?.surveyorDamageImage}
-                src={`${BASE_URL}${viewPolicy?.claimDetails?.damageImage}`}
-                // src={`${BASE_URL}${surveyorReport?.surveyorDamageImage}`}
-              />
-            </Box>
-          </>
-        )}
+        <Box
+          sx={{
+            width: "100%",
+            height: "auto",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            marginTop: "1vh",
+            flexDirection: { xs: "column", sm: "row" },
+          }}
+        >
+          <img
+            style={{
+              width: "48%",
+              height: "auto",
+              border: "1px solid black",
+            }}
+            src={claimImageData?.beforeDamageImage}
+          />
+          <img
+            style={{
+              width: "48%",
+              height: "auto",
+              border: "1px solid black",
+            }}
+            src={claimImageData?.surveyorDamageImage}
+          />
+        </Box>
       </Box>
     </Dialog>
   );

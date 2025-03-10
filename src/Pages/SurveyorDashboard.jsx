@@ -31,7 +31,6 @@ const SurveyorDashboard = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const token = localStorage.getItem("token");
-
   const { surveyorList } = useSelector((state) => state.data);
   useEffect(() => {
     dispatch(getSurveyorPolicyList());

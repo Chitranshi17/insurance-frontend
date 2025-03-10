@@ -6,6 +6,7 @@ import {
   damageCalculation,
   fulfilledPolicies,
   gerSurveyorList,
+  getClaimImages,
   getCustomerPolicyList,
   getGovernmentRequestedList,
   governmentAcceptancePolicy,
@@ -43,7 +44,10 @@ const dataSlice = createSlice({
     fulfilledSuccess: false,
     fulfilledError: false,
     customerFulfilledPolicies: [],
-    damageDataInfoCollect: [],
+    claimImageData: null,
+    claimImageLoading: false,
+    claimImageSuccess: false,
+    claimImageError: false,
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -134,7 +138,6 @@ const dataSlice = createSlice({
       .addCase(objectDamageData.fulfilled, (state, action) => {
         state.damageDataLoading = false;
         state.damageDataSuccess = true;
-        state.damageDataInfoCollect = action.payload;
         state.damageDataError = false;
       })
       .addCase(objectDamageData.rejected, (state) => {
@@ -172,6 +175,22 @@ const dataSlice = createSlice({
         state.fulfilledLoading = false;
         state.fulfilledSuccess = false;
         state.fulfilledError = true;
+      })
+      .addCase(getSurveyorClaimImage.pending, (state, action) => {
+        state.claimImageLoading = true;
+        state.claimImageSuccess = false;
+        state.claimImageError = false;
+      })
+      .addCase(getSurveyorClaimImage.fulfilled, (state, action) => {
+        state.claimImageLoading = false;
+        state.claimImageSuccess = true;
+        state.claimImageError = false;
+        state.claimImageData = action.payload;
+      })
+      .addCase(getSurveyorClaimImage.rejected, (state, action) => {
+        state.claimImageLoading = false;
+        state.claimImageSuccess = false;
+        state.claimImageError = true;
       });
   },
 });
@@ -280,6 +299,18 @@ export const fulfilledPoliciedData = createAsyncThunk(
       return response;
     } catch (error) {
       console.log("Fulfilled policy error: ", error);
+    }
+  }
+);
+
+export const getSurveyorClaimImage = createAsyncThunk(
+  "GET/SURVEYOR/CLAIM/IMAGE",
+  async (policyId) => {
+    try {
+      const response = await getClaimImages(policyId);
+      return response;
+    } catch (error) {
+      console.log("Surveyor Claim Image Error: ", error);
     }
   }
 );
